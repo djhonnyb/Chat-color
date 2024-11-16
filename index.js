@@ -42,6 +42,15 @@ console.log(author);
 console.log(howToUseEn);
 console.log(howToUseId);
 };
+
+const whatsapp = async () => {
+  const { state, saveCreds } = await useMultiFileAuthState('.auth_session');
+  const sock = makeWASocket({
+    auth: state,
+    printQRInTerminal: true,
+    logger,
+  });
+  
 const sendMessage = (message, groupJid) => {
 if (message.message.extendedTextMessage?.text || message.message.conversation) {
   let textMessage = message.message.extendedTextMessage?.text || message.message.conversation;
@@ -56,4 +65,10 @@ if (message.message.extendedTextMessage?.text || message.message.conversation) {
      }
    }
  }
+};
+  sock.ev.on('messages.upsert', async (messages) => {
+    const message = messages[0];
+    const groupJid = message.key.remoteJid;
+    await sendMessage(message, groupJid);
+  });
 };
